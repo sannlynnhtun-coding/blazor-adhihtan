@@ -53,7 +53,7 @@ function extractRules(methodName) {
 
 const zg2uniRules = extractRules("zg2uni");
 const uni2zgRules = extractRules("uni2zg");
-const output = `// Generated from APK Hermes module 489 (rabbit-node 1.0.4).\n` +
+const output = `// Generated from the Rabbit conversion rules (rabbit-node 1.0.4).\n` +
 `(() => {\n` +
 `    const zg2uniRules = ${JSON.stringify(zg2uniRules)};\n` +
 `    const uni2zgRules = ${JSON.stringify(uni2zgRules)};\n` +

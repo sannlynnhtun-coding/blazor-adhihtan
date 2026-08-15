@@ -1,4 +1,4 @@
-base.apk
+base.*
 artifacts
 **/bin
 **/obj

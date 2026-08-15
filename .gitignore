@@ -5,6 +5,6 @@ artifacts/
 .dotnet-install.sh
 .vercel/
 .vs/
-base.apk
+/base.*
 *.user
 .claude-flow/
