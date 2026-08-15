@@ -1,0 +1,39 @@
+@inherits LayoutComponentBase
+@implements IDisposable
+@inject AppStateService AppState
+
+<div class="app-shell @ThemeClass @BackgroundClass">
+    @if (!AppState.IsInitialized)
+    {
+        <main class="in-app-loading" aria-live="polite">
+            <img src="assets/images/splash.png" alt="" />
+            <strong>အဓိဋ္ဌာန်</strong>
+            <span>အချက်အလက်များ ပြင်ဆင်နေပါသည်…</span>
+        </main>
+    }
+    else
+    {
+        <main class="app-content">
+            @Body
+        </main>
+        <BottomNav />
+    }
+</div>
+
+@code {
+    private string ThemeClass => AppState.State.Settings.HighContrast
+        ? AppState.State.Settings.IsDarkMode ? "theme-high-contrast-dark" : "theme-high-contrast-light"
+        : AppState.State.Settings.IsDarkMode ? "theme-dark" : "theme-light";
+
+    private string BackgroundClass => $"season-{AppState.State.Settings.BackgroundStyle}";
+
+    protected override async Task OnInitializedAsync()
+    {
+        AppState.Changed += HandleStateChanged;
+        await AppState.InitializeAsync();
+    }
+
+    private void HandleStateChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => AppState.Changed -= HandleStateChanged;
+}

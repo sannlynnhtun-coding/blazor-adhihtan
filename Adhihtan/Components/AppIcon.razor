@@ -1,0 +1,52 @@
+<svg class="app-icon @Class" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    @switch (Name)
+    {
+        case "home":
+            <path d="M3 11.2 12 4l9 7.2v8.3a.5.5 0 0 1-.5.5H15v-6H9v6H3.5a.5.5 0 0 1-.5-.5z" />
+            break;
+        case "setup":
+            <path d="M12 3a2 2 0 0 1 2 2v5h5a2 2 0 1 1 0 4h-5v5a2 2 0 1 1-4 0v-5H5a2 2 0 1 1 0-4h5V5a2 2 0 0 1 2-2Z" />
+            break;
+        case "counter":
+            <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2" />
+            <path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            break;
+        case "categories":
+            <rect x="3" y="3" width="7" height="7" rx="2" /><rect x="14" y="3" width="7" height="7" rx="2" />
+            <rect x="3" y="14" width="7" height="7" rx="2" /><rect x="14" y="14" width="7" height="7" rx="2" />
+            break;
+        case "settings":
+            <path d="M19.1 13a7.8 7.8 0 0 0 0-2l2-1.5-2-3.4-2.4 1a8 8 0 0 0-1.7-1L14.7 3h-4l-.4 3.1a8 8 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.5a7.8 7.8 0 0 0 0 2l-2 1.5 2 3.4 2.4-1a8 8 0 0 0 1.7 1l.4 3.1h4l.4-3.1a8 8 0 0 0 1.7-1l2.4 1 2-3.4zM12.7 15a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z" />
+            break;
+        case "back":
+            <path d="m15.5 4-8 8 8 8 1.5-1.5-6.5-6.5L17 5.5z" />
+            break;
+        case "share":
+            <path d="M18 16a3 3 0 0 0-2.4 1.2l-6.7-3.8a3 3 0 0 0 0-2.8l6.7-3.8A3 3 0 1 0 15 5l-6.7 3.8a3 3 0 1 0 0 6.4L15 19a3 3 0 1 0 3-3Z" />
+            break;
+        case "undo":
+            <path d="M9 7V3L3 9l6 6v-4c5 0 8 1.7 10 5-1-5-4-9-10-9Z" />
+            break;
+        case "reset":
+            <path d="M12 4a8 8 0 1 1-7.7 10H7a5.5 5.5 0 1 0 1-5.7L11 11H3V3l3.2 3.2A8 8 0 0 1 12 4Z" />
+            break;
+        case "calendar":
+            <path d="M5 3h2v2h10V3h2v2h2v16H3V5h2zm14 7H5v9h14z" />
+            break;
+        case "search":
+            <path d="M10 3a7 7 0 1 1-4.5 12.4L2 19l2 2 3.6-3.5A7 7 0 0 1 10 3Zm0 2a5 5 0 1 0 0 10 5 5 0 0 0 0-10Z" />
+            break;
+        case "info":
+            <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2" />
+            <path d="M11 10h2v7h-2zm0-4h2v2h-2z" />
+            break;
+        default:
+            <circle cx="12" cy="12" r="8" />
+            break;
+    }
+</svg>
+
+@code {
+    [Parameter, EditorRequired] public string Name { get; set; } = string.Empty;
+    [Parameter] public string? Class { get; set; }
+}

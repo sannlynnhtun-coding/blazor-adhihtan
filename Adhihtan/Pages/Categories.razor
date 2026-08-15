@@ -1,0 +1,71 @@
+@page "/categories"
+@inject AppStateService AppState
+@inject NavigationManager Navigation
+
+<PageTitle>အဓိဋ္ဌာန် အမျိုးအစားများ</PageTitle>
+
+<section class="page categories-page">
+    <header class="page-header">
+        <div>
+            <p class="eyebrow">လေ့လာရန်</p>
+            <h1>အဓိဋ္ဌာန်များ</h1>
+            <p class="muted">မူရင်း app ထဲမှ အဓိဋ္ဌာန်နည်းလမ်းနှင့် အစီအစဉ်များ</p>
+        </div>
+    </header>
+
+    <label class="search-box">
+        <AppIcon Name="search" />
+        <input type="search" placeholder="အမည်ဖြင့် ရှာဖွေပါ" @bind="SearchText" @bind:event="oninput" />
+    </label>
+
+    <div class="category-grid">
+        @foreach (var category in FilteredCategories)
+        {
+            <button class="category-card glass-card" @onclick="() => OpenCategory(category.Value)">
+                <img src="@GetCategoryImage(category.Value)" alt="" />
+                <span class="category-card-overlay"></span>
+                <span class="category-card-content">
+                    <small>@category.Duration ရက်</small>
+                    <strong>@category.Label</strong>
+                    <em>@ShortDescription(category)</em>
+                </span>
+            </button>
+        }
+    </div>
+
+    @if (!FilteredCategories.Any())
+    {
+        <article class="glass-card empty-state compact">
+            <AppIcon Name="search" />
+            <h2>ရှာမတွေ့ပါ</h2>
+            <p>အခြားစာလုံးဖြင့် ထပ်ရှာကြည့်ပါ။</p>
+        </article>
+    }
+</section>
+
+@code {
+    private string SearchText { get; set; } = string.Empty;
+
+    private IEnumerable<CategoryDefinition> FilteredCategories =>
+        AppState.Content.Categories.Where(category => string.IsNullOrWhiteSpace(SearchText)
+            || category.Label.Contains(SearchText, StringComparison.OrdinalIgnoreCase)
+            || category.HowToPray.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
+
+    private void OpenCategory(int id) => Navigation.NavigateTo($"categories/{id}");
+
+    private static string GetCategoryImage(int id) => id switch
+    {
+        1 => "assets/images/category-konawin.jpg",
+        2 => "assets/images/category-khanti-ceti.jpg",
+        3 => "assets/images/category-thousand-qualities.jpg",
+        4 => "assets/images/category-buddhist-lent.jpg",
+        5 => "assets/images/category-custom-daily.jpg",
+        _ => "assets/images/image-not-available.png"
+    };
+
+    private static string ShortDescription(CategoryDefinition category)
+    {
+        var source = string.IsNullOrWhiteSpace(category.Benefit) ? category.HowToPray : category.Benefit;
+        return source.Length <= 72 ? source : $"{source[..72]}…";
+    }
+}

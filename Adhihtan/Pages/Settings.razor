@@ -1,0 +1,136 @@
+@page "/settings"
+@inject AppStateService AppState
+
+<PageTitle>ဆက်တင်များ</PageTitle>
+
+<section class="page settings-page">
+    <header class="page-header">
+        <div>
+            <p class="eyebrow">စိတ်ကြိုက်ပြင်ရန်</p>
+            <h1>ဆက်တင်များ</h1>
+            <p class="muted">ပြောင်းလဲမှုအားလုံးကို ဤစက်ထဲတွင် အလိုအလျောက်သိမ်းထားမည်</p>
+        </div>
+    </header>
+
+    <section class="settings-group">
+        <h2>ပုတီးစိပ်ခြင်း</h2>
+        <article class="glass-card settings-card">
+            <label class="setting-select-row">
+                <span><b>ကောင်တာပုံစံ</b><small>ထိနှိပ်ရာတွင် မြင်ရမည့်ပုံစံ</small></span>
+                <select value="@AppState.State.Settings.CounterStyle" @onchange="CounterStyleChanged">
+                    @foreach (var style in CounterStyles)
+                    {
+                        <option value="@style.Value">@style.Label</option>
+                    }
+                </select>
+            </label>
+            <label class="setting-select-row">
+                <span><b>ထိနှိပ်သံ</b><small>အသံ သို့မဟုတ် တုန်ခါမှု</small></span>
+                <select value="@AppState.State.Settings.Audio" @onchange="AudioChanged">
+                    <option value="none">မသုံးပါ</option>
+                    <option value="sound">အသံ</option>
+                    <option value="vibrate">တုန်ခါမှု</option>
+                    <option value="sound_vibrate">အသံနှင့် တုန်ခါမှု</option>
+                </select>
+            </label>
+            <SettingToggle Title="Screen မပိတ်စေရန်" Description="ပုတီးစိပ်နေစဉ် ဖုန်းမျက်နှာပြင်ကို ဖွင့်ထားမည်" Checked="AppState.State.Settings.KeepAwake" Changed="KeepAwakeChanged" />
+            <SettingToggle Title="Reset အတည်ပြုချက်" Description="ယနေ့အရေအတွက် ပြန်စရာမပြုမီ မေးမြန်းမည်" Checked="AppState.State.Settings.ConfirmReset" Changed="ConfirmResetChanged" />
+            <SettingToggle Title="ပြီးဆုံးချိန် သတိပေးရန်" Description="သတ်မှတ်အရေအတွက် ပြည့်ချိန်တွင် သတိပေးမည်" Checked="AppState.State.Settings.Alarm" Changed="AlarmChanged" />
+        </article>
+    </section>
+
+    <section class="settings-group">
+        <h2>အသွင်အပြင်</h2>
+        <article class="glass-card settings-card">
+            <SettingToggle Title="အမှောင်အရောင်" Description="ညပိုင်းတွင် မျက်စိသက်သာစေမည့်အရောင်" Checked="AppState.State.Settings.IsDarkMode" Changed="DarkModeChanged" />
+            <SettingToggle Title="Contrast မြင့်ရန်" Description="စာသားနှင့် button များ ပိုထင်ရှားစေမည်" Checked="AppState.State.Settings.HighContrast" Changed="HighContrastChanged" />
+            <label class="setting-select-row">
+                <span><b>နောက်ခံရာသီ</b><small>App နောက်ခံအရောင်ကို ရွေးပါ</small></span>
+                <select value="@AppState.State.Settings.BackgroundStyle" @onchange="BackgroundChanged">
+                    <option value="rain">မိုးရာသီ</option>
+                    <option value="summer">နွေရာသီ</option>
+                    <option value="autumn">ဆောင်းဦး</option>
+                    <option value="winter">ဆောင်းရာသီ</option>
+                </select>
+            </label>
+            <label class="setting-select-row">
+                <span><b>မြန်မာစာ</b><small>သိမ်းဆည်းမည့် font encoding</small></span>
+                <select value="@AppState.State.Settings.FontEncoding" @onchange="FontChanged">
+                    <option value="unicode">Unicode</option>
+                    <option value="zawgyi">Zawgyi</option>
+                </select>
+            </label>
+        </article>
+    </section>
+
+    <section class="settings-group">
+        <h2>ဒေတာနှင့် Offline</h2>
+        <article class="glass-card backup-card">
+            <div class="backup-copy">
+                <span class="badge-icon"><AppIcon Name="calendar" /></span>
+                <div><b>ဒေတာမိတ္တူ</b><small>အင်တာနက်မလိုဘဲ သိမ်းထားသော အစီအစဉ်နှင့် မှတ်တမ်းများ</small></div>
+            </div>
+            <div class="backup-actions">
+                <button class="secondary-button" @onclick="AppState.ExportBackupAsync">Backup ထုတ်မည်</button>
+                <label class="secondary-button file-button">Backup ပြန်သွင်းမည်<InputFile OnChange="RestoreBackupAsync" accept="application/json,.json" /></label>
+            </div>
+            @if (!string.IsNullOrWhiteSpace(BackupMessage))
+            {
+                <p class="status-message @(BackupSuccess ? "success" : "error")">@BackupMessage</p>
+            }
+        </article>
+    </section>
+
+    <section class="settings-group">
+        <h2>App အကြောင်း</h2>
+        <article class="glass-card about-card">
+            <img src="assets/images/developer.jpg" alt="Developer" />
+            <div>
+                <b>အဓိဋ္ဌာန်</b>
+                <small>APK version @AppState.Content.Source.AppVersion မှ local-only Blazor PWA အဖြစ် ပြန်လည်တည်ဆောက်ထားသည်။ Login မလိုပါ။</small>
+                <span class="offline-badge">● Offline အဆင်သင့်</span>
+            </div>
+        </article>
+    </section>
+</section>
+
+@code {
+    private string? BackupMessage { get; set; }
+    private bool BackupSuccess { get; set; }
+
+    private static IReadOnlyList<SelectOption<string>> CounterStyles { get; } =
+    [
+        new("မူလစက်ဝိုင်း", "default"), new("ရေလှိုင်း", "liquidWater"), new("ပုတီးလုံး", "beads"),
+        new("Ring", "ring"), new("စက်ဝိုင်းတစ်ဝက်", "halfCircle"), new("Pulse", "pulse"),
+        new("Swipe", "swipe"), new("ရိုးရိုး", "simple"), new("ရိုးရာ", "traditional"),
+        new("Smart", "smart"), new("Digital", "digital"), new("Landscape", "landscape"), new("စေတီ", "pagoda")
+    ];
+
+    private Task AudioChanged(ChangeEventArgs args) => Update(settings => settings.Audio = args.Value?.ToString() ?? "none");
+    private Task CounterStyleChanged(ChangeEventArgs args) => Update(settings => settings.CounterStyle = args.Value?.ToString() ?? "default");
+    private Task BackgroundChanged(ChangeEventArgs args) => Update(settings => settings.BackgroundStyle = args.Value?.ToString() ?? "rain");
+    private Task FontChanged(ChangeEventArgs args) => Update(settings => settings.FontEncoding = args.Value?.ToString() ?? "unicode");
+    private Task KeepAwakeChanged(bool value) => Update(settings => settings.KeepAwake = value);
+    private Task ConfirmResetChanged(bool value) => Update(settings => settings.ConfirmReset = value);
+    private Task AlarmChanged(bool value) => Update(settings => settings.Alarm = value);
+    private Task DarkModeChanged(bool value) => Update(settings => settings.IsDarkMode = value);
+    private Task HighContrastChanged(bool value) => Update(settings => settings.HighContrast = value);
+    private Task Update(Action<AppSettings> change) => AppState.UpdateSettingsAsync(change);
+
+    private async Task RestoreBackupAsync(InputFileChangeEventArgs args)
+    {
+        try
+        {
+            await using var stream = args.File.OpenReadStream(5 * 1024 * 1024);
+            using var reader = new StreamReader(stream);
+            var result = await AppState.RestoreBackupAsync(await reader.ReadToEndAsync());
+            BackupSuccess = result.Success;
+            BackupMessage = result.Message;
+        }
+        catch (Exception)
+        {
+            BackupSuccess = false;
+            BackupMessage = "Backup ဖိုင်ကို ဖတ်မရပါ။";
+        }
+    }
+}

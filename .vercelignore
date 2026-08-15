@@ -1,0 +1,8 @@
+base.apk
+artifacts
+**/bin
+**/obj
+.dotnet
+.dotnet-install.sh
+.vercel
+.vs

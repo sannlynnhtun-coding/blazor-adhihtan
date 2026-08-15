@@ -1,0 +1,85 @@
+<div class="counter-face counter-face-@Style">
+    @if (Style == "beads" || Style == "traditional")
+    {
+        <div class="bead-ring" aria-hidden="true">
+            @foreach (var index in Enumerable.Range(0, Math.Min(Math.Max(Total, 9), 27)))
+            {
+                <i class="@(index < FilledBeads ? "filled" : null)" style="--i:@index;--n:@Math.Min(Math.Max(Total, 9), 27)"></i>
+            }
+        </div>
+    }
+    else if (Style == "liquidWater")
+    {
+        <div class="water-orb" aria-hidden="true"><span style="height:@ProgressPercent%"></span></div>
+    }
+    else if (Style == "ring" || Style == "halfCircle" || Style == "pulse")
+    {
+        <div class="progress-orbit @(Style)" style="--progress:@ProgressPercent%" aria-hidden="true"></div>
+    }
+    else if (Style == "pagoda")
+    {
+        <div class="pagoda-counter" aria-hidden="true">
+            <span>♜</span><i></i><i></i><i></i><i></i><i></i>
+        </div>
+    }
+    else if (Style == "digital")
+    {
+        <div class="digital-display" aria-hidden="true">@Count.ToString("D3")</div>
+    }
+    else if (Style == "smart")
+    {
+        <div class="smart-meter" aria-hidden="true">
+            <span>@AppStateService.ToMyanmarNumber(SessionCount)</span>
+            <small>စုစုပေါင်း</small>
+        </div>
+    }
+
+    <button class="counter-touch-button"
+            aria-label="ရေတွက်မည်"
+            @onclick="HandleClickAsync"
+            @onpointerdown="HandlePointerDown"
+            @onpointerup="HandlePointerUpAsync">
+        @if (Style == "swipe")
+        {
+            <span class="swipe-arrow">↑</span>
+            <small>အပေါ်သို့ ဆွဲပါ</small>
+        }
+        else if (Style == "landscape")
+        {
+            <span class="landscape-count">@AppStateService.ToMyanmarNumber(Count)</span>
+            <small>ထိ၍ ရေတွက်ပါ</small>
+        }
+        else
+        {
+            <AppIcon Name="counter" />
+            <strong>@AppStateService.ToMyanmarNumber(Count)</strong>
+            <small>ထိ၍ ရေတွက်ပါ</small>
+        }
+    </button>
+</div>
+
+@code {
+    [Parameter] public string Style { get; set; } = "default";
+    [Parameter] public int Count { get; set; }
+    [Parameter] public int SessionCount { get; set; }
+    [Parameter] public int Total { get; set; } = 108;
+    [Parameter] public double Progress { get; set; }
+    [Parameter] public EventCallback OnCount { get; set; }
+
+    private double? _pointerStartY;
+    private int FilledBeads => (int)Math.Round(Math.Min(Math.Max(Total, 9), 27) * Math.Clamp(Progress, 0, 1));
+    private double ProgressPercent => Math.Round(Math.Clamp(Progress, 0, 1) * 100, 2);
+
+    private Task HandleClickAsync() => Style == "swipe" ? Task.CompletedTask : OnCount.InvokeAsync();
+
+    private void HandlePointerDown(PointerEventArgs args) => _pointerStartY = args.ClientY;
+
+    private async Task HandlePointerUpAsync(PointerEventArgs args)
+    {
+        if (Style == "swipe" && _pointerStartY is { } start && start - args.ClientY > 28)
+        {
+            await OnCount.InvokeAsync();
+        }
+        _pointerStartY = null;
+    }
+}

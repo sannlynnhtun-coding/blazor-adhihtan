@@ -1,0 +1,10 @@
+**/bin/
+**/obj/
+artifacts/
+.dotnet/
+.dotnet-install.sh
+.vercel/
+.vs/
+base.apk
+*.user
+.claude-flow/

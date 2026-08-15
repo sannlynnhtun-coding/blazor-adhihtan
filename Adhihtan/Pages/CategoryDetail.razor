@@ -1,0 +1,137 @@
+@page "/categories/{Id:int}"
+@inject AppStateService AppState
+@inject NavigationManager Navigation
+
+<PageTitle>@(Category?.Label ?? "အဓိဋ္ဌာန်")</PageTitle>
+
+@if (Category is null)
+{
+    <section class="page">
+        <article class="glass-card empty-state">
+            <AppIcon Name="info" />
+            <h1>အချက်အလက် မတွေ့ပါ</h1>
+            <button class="primary-button" @onclick="GoBack">ပြန်သွားမည်</button>
+        </article>
+    </section>
+}
+else
+{
+    <section class="category-detail-page">
+        <header class="detail-hero" style="background-image: linear-gradient(180deg, rgba(17,18,24,.08), rgba(17,18,24,.82)), url('@CategoryImage')">
+            <button class="floating-back-button" @onclick="GoBack" aria-label="ပြန်သွားရန်"><AppIcon Name="back" /></button>
+            <div>
+                <span class="detail-duration">@Category.Duration ရက်တာ</span>
+                <h1>@Category.Label</h1>
+                <p>@Category.Format</p>
+            </div>
+        </header>
+
+        <div class="detail-body">
+            <nav class="detail-tabs" aria-label="အကြောင်းအရာ">
+                <button class="@(SelectedTab == "about" ? "active" : null)" @onclick="ShowAbout">အကြောင်း</button>
+                <button class="@(SelectedTab == "benefit" ? "active" : null)" @onclick="ShowBenefit">အကျိုး</button>
+                <button class="@(SelectedTab == "plan" ? "active" : null)" @onclick="ShowPlan">အစီအစဉ်</button>
+            </nav>
+
+            @if (SelectedTab == "about")
+            {
+                <article class="glass-card prose-card">
+                    <p class="eyebrow">ပြုလုပ်နည်း</p>
+                    <h2>ဘယ်လို အဓိဋ္ဌာန်ဝင်မလဲ</h2>
+                    <p class="multiline-text">@Category.HowToPray</p>
+                </article>
+
+                @foreach (var item in Category.DetailTabs?.Instructions ?? [])
+                {
+                    <article class="glass-card info-card @(item.Caution ? "caution" : null)">
+                        <span class="info-marker">@(item.Caution ? "!" : "✓")</span>
+                        <div><h3>@item.Title</h3><p class="multiline-text">@item.Description</p></div>
+                    </article>
+                }
+            }
+            else if (SelectedTab == "benefit")
+            {
+                <article class="glass-card prose-card accent-card">
+                    <p class="eyebrow">အကျိုးကျေးဇူး</p>
+                    <h2>@Category.Label</h2>
+                    <p class="multiline-text">@Category.Benefit</p>
+                </article>
+
+                @foreach (var item in Category.DetailTabs?.Benefits ?? [])
+                {
+                    <article class="glass-card info-card @(item.Caution ? "caution" : null)">
+                        <span class="info-marker">@(item.Caution ? "!" : "✦")</span>
+                        <div><h3>@item.Title</h3><p class="multiline-text">@item.Description</p></div>
+                    </article>
+                }
+            }
+            else
+            {
+                @if (Schedule.Count > 1)
+                {
+                    <label class="field-label" for="detail-level">အဆင့်ရွေးရန်</label>
+                    <select id="detail-level" class="select-field detail-level-select" @bind="SelectedLevel">
+                        @foreach (var level in Schedule)
+                        {
+                            <option value="@level.Value">@level.Label</option>
+                        }
+                    </select>
+                }
+
+                <div class="schedule-list">
+                    @foreach (var entry in SelectedEntries)
+                    {
+                        <article class="glass-card schedule-row">
+                            <span class="schedule-day">@AppStateService.ToMyanmarNumber(entry.Number)</span>
+                            <div>
+                                <small>@entry.MmDay</small>
+                                <h3>@entry.SpellName</h3>
+                                @if (entry.IsVegetarian)
+                                {
+                                    <em>● သက်သတ်လွတ်နေ့</em>
+                                }
+                            </div>
+                            <strong>@entry.SpellCount ပတ်</strong>
+                        </article>
+                    }
+                </div>
+            }
+
+            <button class="primary-button wide-button detail-start-button" @onclick="StartThisPlan">
+                <AppIcon Name="setup" /> ဤအဓိဋ္ဌာန်ကို စတင်မည်
+            </button>
+        </div>
+    </section>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private string SelectedTab { get; set; } = "about";
+    private int SelectedLevel { get; set; } = 1;
+    private CategoryDefinition? Category => AppState.GetCategory(Id);
+    private IReadOnlyList<ScheduleLevel> Schedule => AppState.GetSchedule(Id);
+    private IEnumerable<SpellEntry> SelectedEntries => Schedule.FirstOrDefault(level => level.Value == SelectedLevel)?.Datasources ?? [];
+    private string CategoryImage => GetCategoryImage(Id);
+
+    protected override void OnParametersSet()
+    {
+        SelectedLevel = Schedule.FirstOrDefault()?.Value ?? 1;
+    }
+
+    private void ShowAbout() => SelectedTab = "about";
+    private void ShowBenefit() => SelectedTab = "benefit";
+    private void ShowPlan() => SelectedTab = "plan";
+    private void GoBack() => Navigation.NavigateTo("categories");
+    private void StartThisPlan() => Navigation.NavigateTo($"setup?category={Id}");
+
+    private static string GetCategoryImage(int id) => id switch
+    {
+        1 => "assets/images/category-konawin.jpg",
+        2 => "assets/images/category-khanti-ceti.jpg",
+        3 => "assets/images/category-thousand-qualities.jpg",
+        4 => "assets/images/category-buddhist-lent.jpg",
+        5 => "assets/images/category-custom-daily.jpg",
+        _ => "assets/images/image-not-available.png"
+    };
+}

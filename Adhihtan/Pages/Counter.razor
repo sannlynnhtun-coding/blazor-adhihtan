@@ -1,0 +1,116 @@
+@page "/counter"
+@implements IAsyncDisposable
+@inject AppStateService AppState
+@inject BrowserStorage Browser
+@inject NavigationManager Navigation
+
+<PageTitle>ပုတီးစိပ်ရန်</PageTitle>
+
+<section class="page counter-page">
+    @if (TodayEntry is null)
+    {
+        <header class="page-header"><h1>ပုတီးစိပ်ရန်</h1></header>
+        <article class="glass-card empty-state">
+            <div class="empty-state-icon"><AppIcon Name="counter" /></div>
+            <h2>ယနေ့အစီအစဉ် မရှိသေးပါ</h2>
+            <p>အဓိဋ္ဌာန်အမျိုးအစားနှင့် ပုတီးစိပ်မည့်အရေအတွက်ကို အရင်ရွေးချယ်ပါ။</p>
+            <button class="primary-button" @onclick="OpenSetup">အစီအစဉ်ရွေးမည်</button>
+        </article>
+    }
+    else
+    {
+        <header class="counter-header">
+            <p class="muted">@BurmeseDateFormatter.Long(DateTime.Today)</p>
+            <h1>@TodayEntry.SpellName</h1>
+            <p>@TodayEntry.SpellCount ပတ် × @AppStateService.ToMyanmarNumber(AppState.State.Plan!.Multiplier) = @AppStateService.ToMyanmarNumber(AppState.TodayTarget) ထိချက်</p>
+        </header>
+
+        <div class="counter-progress-row">
+            <span>@AppStateService.ToMyanmarNumber(AppState.TodayCount)</span>
+            <div class="progress-track"><span style="width:@(AppState.TodayProgress * 100)%"></span></div>
+            <span>@AppStateService.ToMyanmarNumber(AppState.TodayTarget)</span>
+        </div>
+
+        <CounterFace Style="@AppState.State.Settings.CounterStyle"
+                     Count="@RoundCount"
+                     SessionCount="@AppState.TodayCount"
+                     Total="@AppState.State.Plan!.Multiplier"
+                     Progress="@AppState.TodayProgress"
+                     OnCount="AppState.IncrementAsync" />
+
+        @if (TodayEntry.IsDone)
+        {
+            <div class="completion-banner" role="status">
+                <span>✓</span>
+                <div><strong>သာဓု၊ ယနေ့အဓိဋ္ဌာန် ပြီးစီးပါပြီ</strong><small>မှတ်တမ်းထဲသို့ အလိုအလျောက် သိမ်းထားပါသည်</small></div>
+            </div>
+        }
+
+        <div class="counter-actions">
+            <button class="secondary-action" @onclick="AppState.UndoAsync" disabled="@(AppState.TodayCount == 0)">
+                <AppIcon Name="undo" /><span>နောက်ပြန်</span>
+            </button>
+            <button class="secondary-action" @onclick="RequestReset" disabled="@(AppState.TodayCount == 0)">
+                <AppIcon Name="reset" /><span>ပြန်စ</span>
+            </button>
+            <button class="secondary-action" @onclick="AppState.ShareTodayAsync">
+                <AppIcon Name="share" /><span>မျှဝေ</span>
+            </button>
+        </div>
+    }
+</section>
+
+@if (_showResetConfirmation)
+{
+    <div class="modal-backdrop" @onclick="CancelReset">
+        <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="reset-title" @onclick:stopPropagation>
+            <div class="modal-icon danger"><AppIcon Name="reset" /></div>
+            <h2 id="reset-title">ရေတွက်မှု ပြန်စမည်</h2>
+            <p>လက်ရှိရေတွက်ထားမှုကို ဖျက်လိုပါသလား။</p>
+            <div class="modal-actions">
+                <button class="text-button" @onclick="CancelReset">မဖျက်ပါ</button>
+                <button class="danger-button" @onclick="ConfirmResetAsync">ပြန်စမည်</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private bool _showResetConfirmation;
+    private SpellEntry? TodayEntry => AppState.GetTodayEntry();
+    private int RoundCount => AppState.State.Plan is { Multiplier: > 0 } plan && AppState.TodayCount > 0
+        ? (AppState.TodayCount - 1) % plan.Multiplier + 1
+        : 0;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && AppState.State.Settings.KeepAwake && TodayEntry is not null)
+        {
+            await Browser.SetWakeLockAsync(true);
+        }
+    }
+
+    private void OpenSetup() => Navigation.NavigateTo("setup");
+
+    private void RequestReset()
+    {
+        if (AppState.State.Settings.ConfirmReset)
+        {
+            _showResetConfirmation = true;
+        }
+        else
+        {
+            _ = AppState.ResetTodayAsync();
+        }
+    }
+
+    private void CancelReset() => _showResetConfirmation = false;
+
+    private async Task ConfirmResetAsync()
+    {
+        _showResetConfirmation = false;
+        await AppState.ResetTodayAsync();
+    }
+
+    public async ValueTask DisposeAsync() => await Browser.SetWakeLockAsync(false);
+}

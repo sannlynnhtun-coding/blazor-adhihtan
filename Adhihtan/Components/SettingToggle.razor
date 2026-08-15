@@ -1,0 +1,14 @@
+<label class="setting-toggle-row">
+    <span><b>@Title</b><small>@Description</small></span>
+    <input type="checkbox" checked="@Checked" @onchange="HandleChanged" />
+    <i aria-hidden="true"></i>
+</label>
+
+@code {
+    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
+    [Parameter] public string Description { get; set; } = string.Empty;
+    [Parameter] public bool Checked { get; set; }
+    [Parameter] public EventCallback<bool> Changed { get; set; }
+
+    private Task HandleChanged(ChangeEventArgs args) => Changed.InvokeAsync(args.Value is true);
+}

@@ -1,0 +1,149 @@
+@page "/setup"
+@inject AppStateService AppState
+@inject NavigationManager Navigation
+
+<PageTitle>အဓိဋ္ဌာန် စတင်ရန်</PageTitle>
+
+<section class="page setup-page">
+    <header class="page-header">
+        <div>
+            <p class="eyebrow">အစီအစဉ်</p>
+            <h1>အဓိဋ္ဌာန် ရွေးချယ်ရန်</h1>
+            <p class="muted">ယနေ့စတင်မည့် အစီအစဉ်ကို အောက်တွင် သတ်မှတ်ပါ။</p>
+        </div>
+    </header>
+
+    @if (AppState.State.Plan is not null)
+    {
+        <article class="glass-card current-plan-banner">
+            <div class="badge-icon"><AppIcon Name="calendar" /></div>
+            <div>
+                <strong>လက်ရှိအစီအစဉ်</strong>
+                <span>@AppState.GetCategory(AppState.State.Plan.Category)?.Label · @AppStateService.ToMyanmarNumber(AppState.TodayCount)/@AppStateService.ToMyanmarNumber(AppState.TodayTarget)</span>
+            </div>
+        </article>
+    }
+
+    <form class="glass-card setup-form" @onsubmit="SavePlanAsync" @onsubmit:preventDefault>
+        <div class="form-section-heading">
+            <div class="badge-icon">၁</div>
+            <div>
+                <h2>အမျိုးအစား</h2>
+                <p>ပြုလုပ်လိုသော အဓိဋ္ဌာန်ကို ရွေးပါ</p>
+            </div>
+        </div>
+
+        <label class="field-label" for="category">အဓိဋ္ဌာန် အမျိုးအစား</label>
+        <select id="category" class="select-field" @bind="Request.Category" @bind:after="CategoryChanged">
+            @foreach (var category in AppState.Content.Categories)
+            {
+                <option value="@category.Value">@category.Label</option>
+            }
+        </select>
+
+        @if (Request.Category != 5 && Levels.Count > 1)
+        {
+            <label class="field-label" for="level">အဆင့်</label>
+            <select id="level" class="select-field" @bind="Request.Level" @bind:after="LevelChanged">
+                @foreach (var level in Levels)
+                {
+                    <option value="@level.Value">@level.Label</option>
+                }
+            </select>
+        }
+
+        <label class="field-label" for="spell">ဂုဏ်တော်အမျိုးအစား</label>
+        <select id="spell" class="select-field" @bind="Request.SpellId">
+            @foreach (var spell in Spells)
+            {
+                <option value="@spell.Value">@spell.Label</option>
+            }
+        </select>
+
+        @if (Request.Category == 5)
+        {
+            <div class="two-column-fields">
+                <div>
+                    <label class="field-label" for="round-count">ပုတီးအပတ်ရေ</label>
+                    <input id="round-count" class="text-field" type="number" min="1" max="108" @bind="Request.CustomRoundCount" />
+                </div>
+                <div>
+                    <label class="field-label" for="touch-count">တစ်ပတ်လျှင် ထိချက်</label>
+                    <input id="touch-count" class="text-field" type="number" min="1" max="108" @bind="Request.CustomTouchCount" />
+                </div>
+            </div>
+        }
+        else
+        {
+            <label class="field-label" for="multiplier">တစ်လုံးလျှင် ထိချက်အရေအတွက်</label>
+            <select id="multiplier" class="select-field" @bind="Request.Multiplier">
+                @foreach (var option in AppStateService.Multipliers)
+                {
+                    <option value="@option.Value">@option.Label</option>
+                }
+            </select>
+        }
+
+        <aside class="form-preview">
+            <span>ယနေ့ ရွေးချယ်ထားမှု</span>
+            <strong>@SelectedCategory?.Label</strong>
+            <p>@SelectedSpell?.Label</p>
+        </aside>
+
+        <button class="primary-button wide-button" type="submit">
+            <AppIcon Name="counter" /> ပုတီးစိပ်ခြင်း စတင်မည်
+        </button>
+    </form>
+</section>
+
+@code {
+    [SupplyParameterFromQuery(Name = "category")]
+    public int? CategoryFromQuery { get; set; }
+
+    private PlanSetupRequest Request { get; } = new();
+    private IReadOnlyList<ScheduleLevel> Levels => AppState.GetSchedule(Request.Category);
+    private IReadOnlyList<SelectOption<int>> Spells => AppState.GetSpellOptions(Request.Category, Request.Level);
+    private CategoryDefinition? SelectedCategory => AppState.GetCategory(Request.Category);
+    private SelectOption<int>? SelectedSpell => Spells.FirstOrDefault(option => option.Value == Request.SpellId);
+
+    protected override void OnInitialized()
+    {
+        if (CategoryFromQuery is >= 1 and <= 5)
+        {
+            Request.Category = CategoryFromQuery.Value;
+        }
+        else if (AppState.State.Plan is { } plan)
+        {
+            Request.Category = plan.Category;
+            Request.Level = plan.Level;
+            Request.SpellId = plan.SpellId;
+            Request.Multiplier = plan.Multiplier;
+            Request.CustomRoundCount = plan.CustomRoundCount;
+            Request.CustomTouchCount = plan.Multiplier;
+        }
+        NormalizeSelection();
+    }
+
+    private void CategoryChanged()
+    {
+        Request.Level = Levels.FirstOrDefault()?.Value ?? 1;
+        NormalizeSelection();
+    }
+
+    private void LevelChanged() => NormalizeSelection();
+
+    private void NormalizeSelection()
+    {
+        var spells = Spells;
+        if (spells.All(option => option.Value != Request.SpellId))
+        {
+            Request.SpellId = spells.FirstOrDefault()?.Value ?? 1;
+        }
+    }
+
+    private async Task SavePlanAsync()
+    {
+        await AppState.ConfigurePlanAsync(Request);
+        Navigation.NavigateTo("counter");
+    }
+}
