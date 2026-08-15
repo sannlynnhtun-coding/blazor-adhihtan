@@ -1161,9 +1161,59 @@ p {
 
 .bottom-nav-item.active { color: var(--primary); }
 .bottom-nav-item.active:not(.counter-tab) { background: color-mix(in srgb, var(--primary-container) 65%, transparent); }
-.counter-tab { padding-top: .7rem; }
-.counter-tab-icon { position: absolute; top: -1.2rem; display: grid; width: 3.6rem; height: 3.6rem; place-items: center; border: .32rem solid var(--surface); border-radius: 50%; background: var(--primary); color: var(--on-primary); box-shadow: 0 8px 22px color-mix(in srgb, var(--primary) 35%, transparent); }
+.counter-tab {
+    justify-content: flex-end;
+    padding: 0 0 .5rem;
+}
+
+.counter-tab-icon {
+    position: absolute;
+    top: -1.2rem;
+    display: grid;
+    width: 3.6rem;
+    height: 3.6rem;
+    place-items: center;
+    border: .32rem solid var(--surface);
+    border-radius: 50%;
+    background: var(--primary);
+    color: var(--on-primary);
+    box-shadow: 0 8px 22px color-mix(in srgb, var(--primary) 35%, transparent);
+    transform-origin: center;
+    transition: transform .18s cubic-bezier(.2, .8, .2, 1), box-shadow .18s ease-out;
+    will-change: transform;
+}
+
 .counter-tab-icon .app-icon { width: 1.55rem; height: 1.55rem; }
+
+.counter-tab-label {
+    position: relative;
+    display: block;
+    z-index: 1;
+    line-height: 1.4;
+    white-space: nowrap;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .counter-tab:hover .counter-tab-icon {
+        transform: translateY(-.12rem) scale(1.04);
+        box-shadow: 0 11px 28px color-mix(in srgb, var(--primary) 42%, transparent);
+    }
+}
+
+.counter-tab:active .counter-tab-icon {
+    transform: translateY(.08rem) scale(.88);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--primary) 28%, transparent);
+}
+
+.counter-tab.active .counter-tab-icon {
+    animation: counter-tab-pop .42s cubic-bezier(.2, .9, .25, 1.25);
+}
+
+@keyframes counter-tab-pop {
+    0% { transform: translateY(.08rem) scale(.88); }
+    58% { transform: translateY(-.16rem) scale(1.1); }
+    100% { transform: translateY(0) scale(1); }
+}
 
 .in-app-loading,
 .boot-loading {
