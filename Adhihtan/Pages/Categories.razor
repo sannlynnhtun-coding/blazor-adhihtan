@@ -1,6 +1,5 @@
 @page "/categories"
 @inject AppStateService AppState
-@inject NavigationManager Navigation
 
 <PageTitle>အဓိဋ္ဌာန် အမျိုးအစားများ</PageTitle>
 
@@ -9,19 +8,21 @@
         <div>
             <p class="eyebrow">လေ့လာရန်</p>
             <h1>အဓိဋ္ဌာန်များ</h1>
-            <p class="muted">မူရင်း app ထဲမှ အဓိဋ္ဌာန်နည်းလမ်းနှင့် အစီအစဉ်များ</p>
+            <p class="muted">မူရင်းအက်ပ်မှ အဓိဋ္ဌာန်နည်းလမ်းနှင့် အစီအစဉ်များ</p>
         </div>
     </header>
 
-    <label class="search-box">
+    <label class="field-label" for="category-search">အဓိဋ္ဌာန် ရှာရန်</label>
+    <div class="search-box">
         <AppIcon Name="search" />
-        <input type="search" placeholder="အမည်ဖြင့် ရှာဖွေပါ" @bind="SearchText" @bind:event="oninput" />
-    </label>
+        <input id="category-search" type="search" placeholder="အမည် သို့မဟုတ် အကြောင်းအရာ ရိုက်ပါ" @bind="SearchText" @bind:event="oninput" />
+    </div>
+    <p class="visually-hidden" role="status" aria-live="polite" aria-atomic="true">@SearchResultSummary</p>
 
     <div class="category-grid">
         @foreach (var category in FilteredCategories)
         {
-            <button class="category-card glass-card" @onclick="() => OpenCategory(category.Value)">
+            <NavLink class="category-card glass-card" href="@($"categories/{category.Value}")">
                 <img src="@GetCategoryImage(category.Value)" alt="" />
                 <span class="category-card-overlay"></span>
                 <span class="category-card-content">
@@ -29,7 +30,7 @@
                     <strong>@category.Label</strong>
                     <em>@ShortDescription(category)</em>
                 </span>
-            </button>
+            </NavLink>
         }
     </div>
 
@@ -37,8 +38,8 @@
     {
         <article class="glass-card empty-state compact">
             <AppIcon Name="search" />
-            <h2>ရှာမတွေ့ပါ</h2>
-            <p>အခြားစာလုံးဖြင့် ထပ်ရှာကြည့်ပါ။</p>
+            <h2>ကိုက်ညီသော အဓိဋ္ဌာန် မတွေ့ပါ</h2>
+            <p>စာလုံးပေါင်းစစ်ပါ၊ သို့မဟုတ် အခြားအမည်ဖြင့် ရှာကြည့်ပါ။</p>
         </article>
     }
 </section>
@@ -51,7 +52,9 @@
             || category.Label.Contains(SearchText, StringComparison.OrdinalIgnoreCase)
             || category.HowToPray.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
 
-    private void OpenCategory(int id) => Navigation.NavigateTo($"categories/{id}");
+    private string SearchResultSummary => string.IsNullOrWhiteSpace(SearchText)
+        ? string.Empty
+        : $"ကိုက်ညီသော အဓိဋ္ဌာန် {AppStateService.ToMyanmarNumber(FilteredCategories.Count())} ခု တွေ့သည်";
 
     private static string GetCategoryImage(int id) => id switch
     {

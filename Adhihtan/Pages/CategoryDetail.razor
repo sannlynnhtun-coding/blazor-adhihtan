@@ -1,6 +1,5 @@
 @page "/categories/{Id:int}"
 @inject AppStateService AppState
-@inject NavigationManager Navigation
 
 <PageTitle>@(Category?.Label ?? "အဓိဋ္ဌာန်")</PageTitle>
 
@@ -10,7 +9,7 @@
         <article class="glass-card empty-state">
             <AppIcon Name="info" />
             <h1>အချက်အလက် မတွေ့ပါ</h1>
-            <button class="primary-button" @onclick="GoBack">ပြန်သွားမည်</button>
+            <NavLink class="primary-button" href="categories">အဓိဋ္ဌာန်များသို့ ပြန်မည်</NavLink>
         </article>
     </section>
 }
@@ -18,7 +17,7 @@ else
 {
     <section class="category-detail-page">
         <header class="detail-hero" style="background-image: linear-gradient(180deg, rgba(17,18,24,.08), rgba(17,18,24,.82)), url('@CategoryImage')">
-            <button class="floating-back-button" @onclick="GoBack" aria-label="ပြန်သွားရန်"><AppIcon Name="back" /></button>
+            <NavLink class="floating-back-button" href="categories" aria-label="အဓိဋ္ဌာန်များသို့ ပြန်မည်"><AppIcon Name="back" /></NavLink>
             <div>
                 <span class="detail-duration">@Category.Duration ရက်တာ</span>
                 <h1>@Category.Label</h1>
@@ -27,79 +26,85 @@ else
         </header>
 
         <div class="detail-body">
-            <nav class="detail-tabs" aria-label="အကြောင်းအရာ">
-                <button class="@(SelectedTab == "about" ? "active" : null)" @onclick="ShowAbout">အကြောင်း</button>
-                <button class="@(SelectedTab == "benefit" ? "active" : null)" @onclick="ShowBenefit">အကျိုး</button>
-                <button class="@(SelectedTab == "plan" ? "active" : null)" @onclick="ShowPlan">အစီအစဉ်</button>
-            </nav>
+            <div class="detail-tabs" role="tablist" aria-label="အဓိဋ္ဌာန် အကြောင်းအရာ" @onkeydown="HandleTabKeyDownAsync">
+                <button id="tab-about" type="button" role="tab" aria-selected="@(SelectedTab == "about" ? "true" : "false")" aria-controls="panel-about" tabindex="@(SelectedTab == "about" ? 0 : -1)" @ref="_aboutTab" class="@(SelectedTab == "about" ? "active" : null)" @onclick="ShowAbout">အကြောင်း</button>
+                <button id="tab-benefit" type="button" role="tab" aria-selected="@(SelectedTab == "benefit" ? "true" : "false")" aria-controls="panel-benefit" tabindex="@(SelectedTab == "benefit" ? 0 : -1)" @ref="_benefitTab" class="@(SelectedTab == "benefit" ? "active" : null)" @onclick="ShowBenefit">အကျိုး</button>
+                <button id="tab-plan" type="button" role="tab" aria-selected="@(SelectedTab == "plan" ? "true" : "false")" aria-controls="panel-plan" tabindex="@(SelectedTab == "plan" ? 0 : -1)" @ref="_planTab" class="@(SelectedTab == "plan" ? "active" : null)" @onclick="ShowPlan">အစီအစဉ်</button>
+            </div>
 
             @if (SelectedTab == "about")
             {
-                <article class="glass-card prose-card">
-                    <p class="eyebrow">ပြုလုပ်နည်း</p>
-                    <h2>ဘယ်လို အဓိဋ္ဌာန်ဝင်မလဲ</h2>
-                    <p class="multiline-text">@Category.HowToPray</p>
-                </article>
-
-                @foreach (var item in Category.DetailTabs?.Instructions ?? [])
-                {
-                    <article class="glass-card info-card @(item.Caution ? "caution" : null)">
-                        <span class="info-marker">@(item.Caution ? "!" : "✓")</span>
-                        <div><h3>@item.Title</h3><p class="multiline-text">@item.Description</p></div>
+                <div id="panel-about" role="tabpanel" aria-labelledby="tab-about" tabindex="0">
+                    <article class="glass-card prose-card">
+                        <p class="eyebrow">ပြုလုပ်နည်း</p>
+                        <h2>ဘယ်လို အဓိဋ္ဌာန်ဝင်မလဲ</h2>
+                        <p class="multiline-text">@Category.HowToPray</p>
                     </article>
-                }
-            }
-            else if (SelectedTab == "benefit")
-            {
-                <article class="glass-card prose-card accent-card">
-                    <p class="eyebrow">အကျိုးကျေးဇူး</p>
-                    <h2>@Category.Label</h2>
-                    <p class="multiline-text">@Category.Benefit</p>
-                </article>
 
-                @foreach (var item in Category.DetailTabs?.Benefits ?? [])
-                {
-                    <article class="glass-card info-card @(item.Caution ? "caution" : null)">
-                        <span class="info-marker">@(item.Caution ? "!" : "✦")</span>
-                        <div><h3>@item.Title</h3><p class="multiline-text">@item.Description</p></div>
-                    </article>
-                }
-            }
-            else
-            {
-                @if (Schedule.Count > 1)
-                {
-                    <label class="field-label" for="detail-level">အဆင့်ရွေးရန်</label>
-                    <select id="detail-level" class="select-field detail-level-select" @bind="SelectedLevel">
-                        @foreach (var level in Schedule)
-                        {
-                            <option value="@level.Value">@level.Label</option>
-                        }
-                    </select>
-                }
-
-                <div class="schedule-list">
-                    @foreach (var entry in SelectedEntries)
+                    @foreach (var item in Category.DetailTabs?.Instructions ?? [])
                     {
-                        <article class="glass-card schedule-row">
-                            <span class="schedule-day">@AppStateService.ToMyanmarNumber(entry.Number)</span>
-                            <div>
-                                <small>@entry.MmDay</small>
-                                <h3>@entry.SpellName</h3>
-                                @if (entry.IsVegetarian)
-                                {
-                                    <em>● သက်သတ်လွတ်နေ့</em>
-                                }
-                            </div>
-                            <strong>@entry.SpellCount ပတ်</strong>
+                        <article class="glass-card info-card @(item.Caution ? "caution" : null)">
+                            <span class="info-marker" aria-hidden="true">@(item.Caution ? "!" : "✓")</span>
+                            <div><h3>@item.Title</h3><p class="multiline-text">@item.Description</p></div>
                         </article>
                     }
                 </div>
             }
+            else if (SelectedTab == "benefit")
+            {
+                <div id="panel-benefit" role="tabpanel" aria-labelledby="tab-benefit" tabindex="0">
+                    <article class="glass-card prose-card accent-card">
+                        <p class="eyebrow">အကျိုးကျေးဇူး</p>
+                        <h2>@Category.Label</h2>
+                        <p class="multiline-text">@Category.Benefit</p>
+                    </article>
 
-            <button class="primary-button wide-button detail-start-button" @onclick="StartThisPlan">
+                    @foreach (var item in Category.DetailTabs?.Benefits ?? [])
+                    {
+                        <article class="glass-card info-card @(item.Caution ? "caution" : null)">
+                            <span class="info-marker" aria-hidden="true">@(item.Caution ? "!" : "✦")</span>
+                            <div><h3>@item.Title</h3><p class="multiline-text">@item.Description</p></div>
+                        </article>
+                    }
+                </div>
+            }
+            else
+            {
+                <div id="panel-plan" role="tabpanel" aria-labelledby="tab-plan" tabindex="0">
+                    @if (Schedule.Count > 1)
+                    {
+                        <label class="field-label" for="detail-level">အဆင့်ရွေးရန်</label>
+                        <select id="detail-level" class="select-field detail-level-select" @bind="SelectedLevel">
+                            @foreach (var level in Schedule)
+                            {
+                                <option value="@level.Value">@level.Label</option>
+                            }
+                        </select>
+                    }
+
+                    <div class="schedule-list">
+                        @foreach (var entry in SelectedEntries)
+                        {
+                            <article class="glass-card schedule-row">
+                                <span class="schedule-day">@AppStateService.ToMyanmarNumber(entry.Number)</span>
+                                <div>
+                                    <small>@entry.MmDay</small>
+                                    <h3>@entry.SpellName</h3>
+                                    @if (entry.IsVegetarian)
+                                    {
+                                        <em>● သက်သတ်လွတ်နေ့</em>
+                                    }
+                                </div>
+                                <strong>@entry.SpellCount ပတ်</strong>
+                            </article>
+                        }
+                    </div>
+                </div>
+            }
+
+            <NavLink class="primary-button wide-button detail-start-button" href="@($"setup?category={Id}")">
                 <AppIcon Name="setup" /> ဤအဓိဋ္ဌာန်ကို စတင်မည်
-            </button>
+            </NavLink>
         </div>
     </section>
 }
@@ -109,6 +114,10 @@ else
 
     private string SelectedTab { get; set; } = "about";
     private int SelectedLevel { get; set; } = 1;
+    private bool _focusSelectedTab;
+    private ElementReference _aboutTab;
+    private ElementReference _benefitTab;
+    private ElementReference _planTab;
     private CategoryDefinition? Category => AppState.GetCategory(Id);
     private IReadOnlyList<ScheduleLevel> Schedule => AppState.GetSchedule(Id);
     private IEnumerable<SpellEntry> SelectedEntries => Schedule.FirstOrDefault(level => level.Value == SelectedLevel)?.Datasources ?? [];
@@ -116,14 +125,51 @@ else
 
     protected override void OnParametersSet()
     {
+        SelectedTab = "about";
         SelectedLevel = Schedule.FirstOrDefault()?.Value ?? 1;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_focusSelectedTab)
+        {
+            _focusSelectedTab = false;
+            await SelectedTabReference.FocusAsync();
+        }
     }
 
     private void ShowAbout() => SelectedTab = "about";
     private void ShowBenefit() => SelectedTab = "benefit";
     private void ShowPlan() => SelectedTab = "plan";
-    private void GoBack() => Navigation.NavigateTo("categories");
-    private void StartThisPlan() => Navigation.NavigateTo($"setup?category={Id}");
+
+    private Task HandleTabKeyDownAsync(KeyboardEventArgs args)
+    {
+        string[] tabs = ["about", "benefit", "plan"];
+        var currentIndex = Array.IndexOf(tabs, SelectedTab);
+        var nextIndex = args.Key switch
+        {
+            "ArrowRight" => (currentIndex + 1) % tabs.Length,
+            "ArrowLeft" => (currentIndex - 1 + tabs.Length) % tabs.Length,
+            "Home" => 0,
+            "End" => tabs.Length - 1,
+            _ => currentIndex
+        };
+
+        if (nextIndex != currentIndex)
+        {
+            SelectedTab = tabs[nextIndex];
+            _focusSelectedTab = true;
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private ElementReference SelectedTabReference => SelectedTab switch
+    {
+        "benefit" => _benefitTab,
+        "plan" => _planTab,
+        _ => _aboutTab
+    };
 
     private static string GetCategoryImage(int id) => id switch
     {

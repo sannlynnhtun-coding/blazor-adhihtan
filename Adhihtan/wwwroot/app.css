@@ -48,10 +48,6 @@ p {
     margin-top: 0;
 }
 
-h1:focus {
-    outline: none;
-}
-
 .app-shell {
     --primary: #485d92;
     --on-primary: #fff;
@@ -72,6 +68,37 @@ h1:focus {
     isolation: isolate;
     position: relative;
     transition: background-color .25s, color .25s;
+}
+
+.skip-link {
+    position: fixed;
+    z-index: 200;
+    top: .6rem;
+    left: .6rem;
+    padding: .65rem .9rem;
+    border-radius: .75rem;
+    background: var(--primary);
+    color: var(--on-primary);
+    font-weight: 750;
+    transform: translateY(calc(-100% - 1rem));
+    transition: transform .15s ease;
+}
+
+.skip-link:focus {
+    transform: translateY(0);
+}
+
+.visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    overflow: hidden !important;
+    margin: -1px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    clip: rect(0 0 0 0) !important;
+    clip-path: inset(50%) !important;
+    white-space: nowrap !important;
 }
 
 .app-shell::before,
@@ -456,6 +483,7 @@ h1:focus {
 }
 
 .today-card {
+    display: block;
     padding: 1.15rem;
     cursor: pointer;
 }
@@ -572,6 +600,14 @@ h1:focus {
     min-height: 3.2rem;
     padding: .65rem .85rem;
     border-radius: 1rem;
+}
+
+.field-help {
+    display: block;
+    margin-top: .35rem;
+    color: var(--muted);
+    font-size: .68rem;
+    line-height: 1.5;
 }
 
 .select-field:focus,
@@ -793,25 +829,22 @@ h1:focus {
 .secondary-action span { font-size: .68rem; }
 .secondary-action:disabled { cursor: default; opacity: .4; }
 
-.modal-backdrop {
-    position: fixed;
-    z-index: 50;
-    inset: 0;
-    display: grid;
-    padding: 1rem;
-    place-items: center;
-    background: rgba(4, 8, 18, .55);
-    backdrop-filter: blur(8px);
-}
-
 .modal-card {
-    width: min(100%, 25rem);
+    width: min(calc(100% - 2rem), 25rem);
+    max-width: none;
+    margin: auto;
     padding: 1.4rem;
+    border: 0;
     border-radius: 1.5rem;
     background: var(--surface);
     color: var(--on-surface);
     text-align: center;
     box-shadow: 0 24px 80px rgba(0,0,0,.35);
+}
+
+.modal-card::backdrop {
+    background: rgba(4, 8, 18, .55);
+    backdrop-filter: blur(8px);
 }
 
 .modal-icon { width: 3.3rem; height: 3.3rem; margin: auto; border-radius: 50%; }
@@ -847,6 +880,7 @@ h1:focus {
 }
 
 .category-card {
+    display: block;
     position: relative;
     min-height: 12rem;
     overflow: hidden;
@@ -1164,7 +1198,17 @@ body:has(.app-shell) > .boot-loading { display: none; }
 }
 
 #blazor-error-ui .reload { margin-left: .4rem; text-decoration: underline; }
-#blazor-error-ui .dismiss { float: right; cursor: pointer; }
+#blazor-error-ui .dismiss { float: right; padding: .1rem .25rem; border: 0; background: transparent; color: inherit; cursor: pointer; }
+
+.app-shell :where(a, button, input, select, [tabindex]):focus-visible,
+#blazor-error-ui :where(a, button):focus-visible {
+    outline: 3px solid var(--primary, #fff);
+    outline-offset: 3px;
+}
+
+[role="tabpanel"]:focus-visible {
+    border-radius: 1rem;
+}
 
 @media (min-width: 700px) {
     .app-shell { width: min(100%, 760px); margin: 0 auto; box-shadow: 0 0 50px rgba(26,35,65,.12); }

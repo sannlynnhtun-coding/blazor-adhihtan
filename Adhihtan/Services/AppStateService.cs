@@ -211,18 +211,18 @@ public sealed class AppStateService(HttpClient httpClient, BrowserStorage storag
             var backup = JsonSerializer.Deserialize<BackupEnvelope>(json, JsonOptions);
             if (backup?.Version != 1 || backup.State is null)
             {
-                return (false, "Backup ဖိုင်ပုံစံ မမှန်ပါ။");
+                return (false, "ဒေတာမိတ္တူဖိုင်ပုံစံ မမှန်ပါ။ မှန်ကန်သော အဓိဋ္ဌာန် ဒေတာမိတ္တူဖိုင်ကို ရွေးပါ။");
             }
 
             State = backup.State;
             NormalizeState();
             EnsureCustomTodayEntry();
             await SaveAndNotifyAsync();
-            return (true, "Backup data ကို ပြန်လည်ထည့်သွင်းပြီးပါပြီ။");
+            return (true, "ဒေတာမိတ္တူကို ပြန်လည်ထည့်သွင်းပြီးပါပြီ။");
         }
         catch (JsonException)
         {
-            return (false, "Backup JSON ကို ဖတ်မရပါ။");
+            return (false, "ဒေတာမိတ္တူ JSON ဖိုင်ကို ဖတ်၍မရပါ။ ဖိုင်မှန်ကန်ကြောင်း စစ်ပြီး ထပ်မံရွေးပါ။");
         }
     }
 

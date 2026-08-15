@@ -6,3 +6,4 @@ artifacts
 .dotnet-install.sh
 .vercel
 .vs
+.agents

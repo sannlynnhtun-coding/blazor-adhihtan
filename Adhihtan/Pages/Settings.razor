@@ -33,8 +33,8 @@
                     <option value="sound_vibrate">အသံနှင့် တုန်ခါမှု</option>
                 </select>
             </label>
-            <SettingToggle Title="Screen မပိတ်စေရန်" Description="ပုတီးစိပ်နေစဉ် ဖုန်းမျက်နှာပြင်ကို ဖွင့်ထားမည်" Checked="AppState.State.Settings.KeepAwake" Changed="KeepAwakeChanged" />
-            <SettingToggle Title="Reset အတည်ပြုချက်" Description="ယနေ့အရေအတွက် ပြန်စရာမပြုမီ မေးမြန်းမည်" Checked="AppState.State.Settings.ConfirmReset" Changed="ConfirmResetChanged" />
+            <SettingToggle Title="မျက်နှာပြင် မပိတ်စေရန်" Description="ပုတီးစိပ်နေစဉ် ဖုန်းမျက်နှာပြင်ကို ဖွင့်ထားမည်" Checked="AppState.State.Settings.KeepAwake" Changed="KeepAwakeChanged" />
+            <SettingToggle Title="ရေတွက်မှု ပြန်စမည့်အခါ အတည်ပြုရန်" Description="ယနေ့အရေအတွက်ကို သုညသို့မပြန်မီ မေးမြန်းမည်" Checked="AppState.State.Settings.ConfirmReset" Changed="ConfirmResetChanged" />
             <SettingToggle Title="ပြီးဆုံးချိန် သတိပေးရန်" Description="သတ်မှတ်အရေအတွက် ပြည့်ချိန်တွင် သတိပေးမည်" Checked="AppState.State.Settings.Alarm" Changed="AlarmChanged" />
         </article>
     </section>
@@ -43,9 +43,9 @@
         <h2>အသွင်အပြင်</h2>
         <article class="glass-card settings-card">
             <SettingToggle Title="အမှောင်အရောင်" Description="ညပိုင်းတွင် မျက်စိသက်သာစေမည့်အရောင်" Checked="AppState.State.Settings.IsDarkMode" Changed="DarkModeChanged" />
-            <SettingToggle Title="Contrast မြင့်ရန်" Description="စာသားနှင့် button များ ပိုထင်ရှားစေမည်" Checked="AppState.State.Settings.HighContrast" Changed="HighContrastChanged" />
+            <SettingToggle Title="အရောင်ကွာခြားမှု မြှင့်ရန်" Description="စာသားနှင့် ခလုတ်များကို ပိုထင်ရှားစေမည်" Checked="AppState.State.Settings.HighContrast" Changed="HighContrastChanged" />
             <label class="setting-select-row">
-                <span><b>နောက်ခံရာသီ</b><small>App နောက်ခံအရောင်ကို ရွေးပါ</small></span>
+                <span><b>နောက်ခံရာသီ</b><small>အက်ပ်နောက်ခံအရောင်ကို ရွေးပါ</small></span>
                 <select value="@AppState.State.Settings.BackgroundStyle" @onchange="BackgroundChanged">
                     <option value="rain">မိုးရာသီ</option>
                     <option value="summer">နွေရာသီ</option>
@@ -54,7 +54,7 @@
                 </select>
             </label>
             <label class="setting-select-row">
-                <span><b>မြန်မာစာ</b><small>သိမ်းဆည်းမည့် font encoding</small></span>
+                <span><b>မြန်မာစာ</b><small>အသုံးပြုမည့် စာလုံးဖော်ပြမှုပုံစံ</small></span>
                 <select value="@AppState.State.Settings.FontEncoding" @onchange="FontChanged">
                     <option value="unicode">Unicode</option>
                     <option value="zawgyi">Zawgyi</option>
@@ -64,31 +64,31 @@
     </section>
 
     <section class="settings-group">
-        <h2>ဒေတာနှင့် Offline</h2>
+        <h2>ဒေတာနှင့် အင်တာနက်မရှိချိန်</h2>
         <article class="glass-card backup-card">
             <div class="backup-copy">
                 <span class="badge-icon"><AppIcon Name="calendar" /></span>
                 <div><b>ဒေတာမိတ္တူ</b><small>အင်တာနက်မလိုဘဲ သိမ်းထားသော အစီအစဉ်နှင့် မှတ်တမ်းများ</small></div>
             </div>
             <div class="backup-actions">
-                <button class="secondary-button" @onclick="AppState.ExportBackupAsync">Backup ထုတ်မည်</button>
-                <label class="secondary-button file-button">Backup ပြန်သွင်းမည်<InputFile OnChange="RestoreBackupAsync" accept="application/json,.json" /></label>
+                <button class="secondary-button" @onclick="AppState.ExportBackupAsync">ဒေတာမိတ္တူ ထုတ်မည်</button>
+                <label class="secondary-button file-button">ဒေတာမိတ္တူ ပြန်သွင်းမည်<InputFile OnChange="RestoreBackupAsync" accept="application/json,.json" aria-label="ဒေတာမိတ္တူ JSON ဖိုင် ရွေးရန်" /></label>
             </div>
             @if (!string.IsNullOrWhiteSpace(BackupMessage))
             {
-                <p class="status-message @(BackupSuccess ? "success" : "error")">@BackupMessage</p>
+                <p class="status-message @(BackupSuccess ? "success" : "error")" role="@(BackupSuccess ? "status" : "alert")" aria-live="@(BackupSuccess ? "polite" : "assertive")" aria-atomic="true">@BackupMessage</p>
             }
         </article>
     </section>
 
     <section class="settings-group">
-        <h2>App အကြောင်း</h2>
+        <h2>အက်ပ်အကြောင်း</h2>
         <article class="glass-card about-card">
-            <img src="assets/images/developer.jpg" alt="Developer" />
+            <img src="assets/images/developer.jpg" alt="အက်ပ်ရေးသားသူ၏ပုံ" />
             <div>
                 <b>အဓိဋ္ဌာန်</b>
-                <small>APK version @AppState.Content.Source.AppVersion မှ local-only Blazor PWA အဖြစ် ပြန်လည်တည်ဆောက်ထားသည်။ Login မလိုပါ။</small>
-                <span class="offline-badge">● Offline အဆင်သင့်</span>
+                <small>မူရင်း APK ဗားရှင်း @AppState.Content.Source.AppVersion ကို အင်တာနက်မလိုဘဲ သုံးနိုင်သော Blazor PWA အဖြစ် ပြန်လည်တည်ဆောက်ထားသည်။ အကောင့်ဝင်ရန် မလိုပါ။</small>
+                <span class="offline-badge">● အင်တာနက်မရှိချိန် အသုံးပြုနိုင်သည်</span>
             </div>
         </article>
     </section>
@@ -101,9 +101,9 @@
     private static IReadOnlyList<SelectOption<string>> CounterStyles { get; } =
     [
         new("မူလစက်ဝိုင်း", "default"), new("ရေလှိုင်း", "liquidWater"), new("ပုတီးလုံး", "beads"),
-        new("Ring", "ring"), new("စက်ဝိုင်းတစ်ဝက်", "halfCircle"), new("Pulse", "pulse"),
-        new("Swipe", "swipe"), new("ရိုးရိုး", "simple"), new("ရိုးရာ", "traditional"),
-        new("Smart", "smart"), new("Digital", "digital"), new("Landscape", "landscape"), new("စေတီ", "pagoda")
+        new("ကွင်းပုံ", "ring"), new("စက်ဝိုင်းတစ်ဝက်", "halfCircle"), new("ခုန်နှုန်းပုံ", "pulse"),
+        new("အပေါ်သို့ဆွဲ", "swipe"), new("ရိုးရိုး", "simple"), new("ရိုးရာ", "traditional"),
+        new("အချက်အလက်ပြပုံ", "smart"), new("ဒစ်ဂျစ်တယ်", "digital"), new("အလျားလိုက်", "landscape"), new("စေတီ", "pagoda")
     ];
 
     private Task AudioChanged(ChangeEventArgs args) => Update(settings => settings.Audio = args.Value?.ToString() ?? "none");
@@ -130,7 +130,7 @@
         catch (Exception)
         {
             BackupSuccess = false;
-            BackupMessage = "Backup ဖိုင်ကို ဖတ်မရပါ။";
+            BackupMessage = "ဒေတာမိတ္တူဖိုင်ကို ဖတ်၍မရပါ။ JSON ဖိုင်မှန်ကန်ကြောင်း စစ်ပြီး ထပ်မံရွေးပါ။";
         }
     }
 }

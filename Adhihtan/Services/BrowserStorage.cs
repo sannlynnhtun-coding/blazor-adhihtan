@@ -42,4 +42,13 @@ public sealed class BrowserStorage(IJSRuntime jsRuntime)
 
     public ValueTask SetFontEncodingAsync(string encoding) =>
         jsRuntime.InvokeVoidAsync("adhihtanApp.setFontEncoding", encoding);
+
+    public ValueTask ShowDialogAsync(string id) =>
+        jsRuntime.InvokeVoidAsync("adhihtanApp.showDialog", id);
+
+    public ValueTask CloseDialogAsync(string id) =>
+        jsRuntime.InvokeVoidAsync("adhihtanApp.closeDialog", id);
+
+    public ValueTask FocusElementAsync(string id) =>
+        jsRuntime.InvokeVoidAsync("adhihtanApp.focusElement", id);
 }

@@ -29,7 +29,7 @@
             <div class="badge-icon">၁</div>
             <div>
                 <h2>အမျိုးအစား</h2>
-                <p>ပြုလုပ်လိုသော အဓိဋ္ဌာန်ကို ရွေးပါ</p>
+                <p>လိုက်နာမည့် အဓိဋ္ဌာန်ကို ရွေးပါ</p>
             </div>
         </div>
 
@@ -64,12 +64,14 @@
         {
             <div class="two-column-fields">
                 <div>
-                    <label class="field-label" for="round-count">ပုတီးအပတ်ရေ</label>
-                    <input id="round-count" class="text-field" type="number" min="1" max="108" @bind="Request.CustomRoundCount" />
+                    <label class="field-label" for="round-count">ပုတီးပတ် အရေအတွက်</label>
+                    <input id="round-count" class="text-field" type="number" min="1" max="108" required inputmode="numeric" aria-describedby="round-count-help" @bind="Request.CustomRoundCount" />
+                    <small id="round-count-help" class="field-help">၁ မှ ၁၀၈ အတွင်း ထည့်ပါ။</small>
                 </div>
                 <div>
-                    <label class="field-label" for="touch-count">တစ်ပတ်လျှင် ထိချက်</label>
-                    <input id="touch-count" class="text-field" type="number" min="1" max="108" @bind="Request.CustomTouchCount" />
+                    <label class="field-label" for="touch-count">တစ်ပတ်လျှင် ထိရမည့်အရေအတွက်</label>
+                    <input id="touch-count" class="text-field" type="number" min="1" max="108" required inputmode="numeric" aria-describedby="touch-count-help" @bind="Request.CustomTouchCount" />
+                    <small id="touch-count-help" class="field-help">၁ မှ ၁၀၈ အတွင်း ထည့်ပါ။</small>
                 </div>
             </div>
         }
@@ -91,7 +93,7 @@
         </aside>
 
         <button class="primary-button wide-button" type="submit">
-            <AppIcon Name="counter" /> ပုတီးစိပ်ခြင်း စတင်မည်
+            <AppIcon Name="counter" /> အစီအစဉ်သိမ်းပြီး စတင်မည်
         </button>
     </form>
 </section>

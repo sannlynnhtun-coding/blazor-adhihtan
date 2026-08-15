@@ -19,7 +19,7 @@
 
 <body>
     <div id="app">
-        <div class="boot-loading" aria-live="polite">
+        <div class="boot-loading" role="status" aria-live="polite" aria-atomic="true">
             <img src="assets/images/splash.png" alt="" />
             <strong>အဓိဋ္ဌာန်</strong>
             <span>ခဏစောင့်ပါ…</span>
@@ -27,9 +27,9 @@
     </div>
 
     <div id="blazor-error-ui" data-nosnippet>
-        မမျှော်လင့်ထားသော အမှားတစ်ခုဖြစ်နေပါသည်။
-        <a href="." class="reload">ပြန်ဖွင့်မည်</a>
-        <span class="dismiss">🗙</span>
+        မမျှော်လင့်ထားသော အမှားတစ်ခု ဖြစ်နေပါသည်။
+        <a href="." class="reload">အက်ပ်ကို ပြန်ဖွင့်မည်</a>
+        <button type="button" class="dismiss" aria-label="အမှားသတိပေးချက် ပိတ်မည်">🗙</button>
     </div>
 
     <script src="js/myanmar-converter.js"></script>

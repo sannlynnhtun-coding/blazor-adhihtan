@@ -35,8 +35,10 @@
     }
 
     <button class="counter-touch-button"
-            aria-label="ရေတွက်မည်"
+            type="button"
+            aria-label="@AccessibleLabel"
             @onclick="HandleClickAsync"
+            @onkeyup="HandleKeyUpAsync"
             @onpointerdown="HandlePointerDown"
             @onpointerup="HandlePointerUpAsync">
         @if (Style == "swipe")
@@ -69,8 +71,14 @@
     private double? _pointerStartY;
     private int FilledBeads => (int)Math.Round(Math.Min(Math.Max(Total, 9), 27) * Math.Clamp(Progress, 0, 1));
     private double ProgressPercent => Math.Round(Math.Clamp(Progress, 0, 1) * 100, 2);
+    private string AccessibleLabel => $"ပုတီးတစ်လုံး ရေတွက်မည်။ လက်ရှိ {AppStateService.ToMyanmarNumber(SessionCount)} ထိချက်";
 
     private Task HandleClickAsync() => Style == "swipe" ? Task.CompletedTask : OnCount.InvokeAsync();
+
+    private Task HandleKeyUpAsync(KeyboardEventArgs args) =>
+        Style == "swipe" && args.Key is "Enter" or " " or "Spacebar"
+            ? OnCount.InvokeAsync()
+            : Task.CompletedTask;
 
     private void HandlePointerDown(PointerEventArgs args) => _pointerStartY = args.ClientY;
 

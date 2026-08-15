@@ -88,6 +88,21 @@
                 // Browsers can disable service workers in private or insecure contexts.
             }
         },
-        setFontEncoding: encoding => window.adhihtanMyanmar?.setEncoding(encoding)
+        setFontEncoding: encoding => window.adhihtanMyanmar?.setEncoding(encoding),
+        showDialog: id => {
+            const dialog = document.getElementById(id);
+            if (dialog instanceof HTMLDialogElement && !dialog.open) {
+                dialog.showModal();
+            }
+        },
+        closeDialog: id => {
+            const dialog = document.getElementById(id);
+            if (dialog instanceof HTMLDialogElement && dialog.open) {
+                dialog.close();
+            }
+        },
+        focusElement: id => {
+            window.requestAnimationFrame(() => document.getElementById(id)?.focus());
+        }
     };
 })();

@@ -1,11 +1,22 @@
 @inherits LayoutComponentBase
 @implements IDisposable
 @inject AppStateService AppState
+@inject BrowserStorage BrowserStorage
 
 <div class="app-shell @ThemeClass @BackgroundClass">
+    <a class="skip-link"
+       href="#main-content"
+       @onclick="FocusMainContentAsync"
+       @onclick:preventDefault="true">ပင်မအကြောင်းအရာသို့ ကျော်သွားမည်</a>
     @if (!AppState.IsInitialized)
     {
-        <main class="in-app-loading" aria-live="polite">
+        <main id="main-content"
+              class="in-app-loading"
+              role="status"
+              aria-live="polite"
+              aria-atomic="true"
+              aria-busy="true"
+              tabindex="-1">
             <img src="assets/images/splash.png" alt="" />
             <strong>အဓိဋ္ဌာန်</strong>
             <span>အချက်အလက်များ ပြင်ဆင်နေပါသည်…</span>
@@ -13,7 +24,7 @@
     }
     else
     {
-        <main class="app-content">
+        <main id="main-content" class="app-content" tabindex="-1">
             @Body
         </main>
         <BottomNav />
@@ -34,6 +45,8 @@
     }
 
     private void HandleStateChanged() => InvokeAsync(StateHasChanged);
+
+    private async Task FocusMainContentAsync() => await BrowserStorage.FocusElementAsync("main-content");
 
     public void Dispose() => AppState.Changed -= HandleStateChanged;
 }

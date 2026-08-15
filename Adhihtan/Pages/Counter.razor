@@ -2,7 +2,6 @@
 @implements IAsyncDisposable
 @inject AppStateService AppState
 @inject BrowserStorage Browser
-@inject NavigationManager Navigation
 
 <PageTitle>ပုတီးစိပ်ရန်</PageTitle>
 
@@ -14,20 +13,20 @@
             <div class="empty-state-icon"><AppIcon Name="counter" /></div>
             <h2>ယနေ့အစီအစဉ် မရှိသေးပါ</h2>
             <p>အဓိဋ္ဌာန်အမျိုးအစားနှင့် ပုတီးစိပ်မည့်အရေအတွက်ကို အရင်ရွေးချယ်ပါ။</p>
-            <button class="primary-button" @onclick="OpenSetup">အစီအစဉ်ရွေးမည်</button>
+            <NavLink class="primary-button" href="setup">အစီအစဉ် ရွေးမည်</NavLink>
         </article>
     }
     else
     {
         <header class="counter-header">
             <p class="muted">@BurmeseDateFormatter.Long(DateTime.Today)</p>
-            <h1>@TodayEntry.SpellName</h1>
+            <h1 @ref="_counterHeading" tabindex="-1">@TodayEntry.SpellName</h1>
             <p>@TodayEntry.SpellCount ပတ် × @AppStateService.ToMyanmarNumber(AppState.State.Plan!.Multiplier) = @AppStateService.ToMyanmarNumber(AppState.TodayTarget) ထိချက်</p>
         </header>
 
         <div class="counter-progress-row">
             <span>@AppStateService.ToMyanmarNumber(AppState.TodayCount)</span>
-            <div class="progress-track"><span style="width:@(AppState.TodayProgress * 100)%"></span></div>
+            <div class="progress-track" role="progressbar" aria-label="ယနေ့ ပုတီးစိပ်ပြီးစီးမှု" aria-valuenow="@AppState.TodayCount" aria-valuemin="0" aria-valuemax="@AppState.TodayTarget" aria-valuetext="@ProgressValueText"><span style="width:@(AppState.TodayProgress * 100)%"></span></div>
             <span>@AppStateService.ToMyanmarNumber(AppState.TodayTarget)</span>
         </div>
 
@@ -40,20 +39,20 @@
 
         @if (TodayEntry.IsDone)
         {
-            <div class="completion-banner" role="status">
+            <div class="completion-banner" role="status" aria-live="polite" aria-atomic="true">
                 <span>✓</span>
                 <div><strong>သာဓု၊ ယနေ့အဓိဋ္ဌာန် ပြီးစီးပါပြီ</strong><small>မှတ်တမ်းထဲသို့ အလိုအလျောက် သိမ်းထားပါသည်</small></div>
             </div>
         }
 
         <div class="counter-actions">
-            <button class="secondary-action" @onclick="AppState.UndoAsync" disabled="@(AppState.TodayCount == 0)">
+            <button class="secondary-action" type="button" @onclick="AppState.UndoAsync" disabled="@(AppState.TodayCount == 0)">
                 <AppIcon Name="undo" /><span>နောက်ပြန်</span>
             </button>
-            <button class="secondary-action" @onclick="RequestReset" disabled="@(AppState.TodayCount == 0)">
+            <button class="secondary-action" type="button" @ref="_resetButton" @onclick="RequestReset" disabled="@(AppState.TodayCount == 0)">
                 <AppIcon Name="reset" /><span>ပြန်စ</span>
             </button>
-            <button class="secondary-action" @onclick="AppState.ShareTodayAsync">
+            <button class="secondary-action" type="button" @onclick="AppState.ShareTodayAsync">
                 <AppIcon Name="share" /><span>မျှဝေ</span>
             </button>
         </div>
@@ -62,21 +61,24 @@
 
 @if (_showResetConfirmation)
 {
-    <div class="modal-backdrop" @onclick="CancelReset">
-        <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="reset-title" @onclick:stopPropagation>
-            <div class="modal-icon danger"><AppIcon Name="reset" /></div>
-            <h2 id="reset-title">ရေတွက်မှု ပြန်စမည်</h2>
-            <p>လက်ရှိရေတွက်ထားမှုကို ဖျက်လိုပါသလား။</p>
-            <div class="modal-actions">
-                <button class="text-button" @onclick="CancelReset">မဖျက်ပါ</button>
-                <button class="danger-button" @onclick="ConfirmResetAsync">ပြန်စမည်</button>
-            </div>
+    <dialog id="reset-dialog" class="modal-card" aria-labelledby="reset-title" aria-describedby="reset-description" @onkeydown="HandleDialogKeyDownAsync">
+        <div class="modal-icon danger"><AppIcon Name="reset" /></div>
+        <h2 id="reset-title">ယနေ့ရေတွက်မှုကို ပြန်စမလား</h2>
+        <p id="reset-description">လက်ရှိရေတွက်ထားသော အရေအတွက်ကို သုညသို့ ပြန်ထားမည်။ ဤလုပ်ဆောင်ချက်ကို နောက်ပြန်ယူ၍မရပါ။</p>
+        <div class="modal-actions">
+            <button class="text-button" type="button" autofocus @onclick="CancelResetAsync">မပြန်စပါ</button>
+            <button class="danger-button" type="button" @onclick="ConfirmResetAsync">ရေတွက်မှု ပြန်စမည်</button>
         </div>
-    </div>
+    </dialog>
 }
 
 @code {
     private bool _showResetConfirmation;
+    private bool _openResetDialog;
+    private bool _returnFocusToReset;
+    private bool _focusCounterHeading;
+    private ElementReference _resetButton;
+    private ElementReference _counterHeading;
     private SpellEntry? TodayEntry => AppState.GetTodayEntry();
     private int RoundCount => AppState.State.Plan is { Multiplier: > 0 } plan && AppState.TodayCount > 0
         ? (AppState.TodayCount - 1) % plan.Multiplier + 1
@@ -88,15 +90,35 @@
         {
             await Browser.SetWakeLockAsync(true);
         }
-    }
 
-    private void OpenSetup() => Navigation.NavigateTo("setup");
+        if (_openResetDialog)
+        {
+            _openResetDialog = false;
+            await Browser.ShowDialogAsync("reset-dialog");
+        }
+
+        if (_returnFocusToReset)
+        {
+            _returnFocusToReset = false;
+            if (AppState.TodayCount > 0)
+            {
+                await _resetButton.FocusAsync();
+            }
+        }
+
+        if (_focusCounterHeading)
+        {
+            _focusCounterHeading = false;
+            await _counterHeading.FocusAsync();
+        }
+    }
 
     private void RequestReset()
     {
         if (AppState.State.Settings.ConfirmReset)
         {
             _showResetConfirmation = true;
+            _openResetDialog = true;
         }
         else
         {
@@ -104,13 +126,25 @@
         }
     }
 
-    private void CancelReset() => _showResetConfirmation = false;
+    private async Task CancelResetAsync()
+    {
+        await Browser.CloseDialogAsync("reset-dialog");
+        _showResetConfirmation = false;
+        _returnFocusToReset = true;
+    }
+
+    private Task HandleDialogKeyDownAsync(KeyboardEventArgs args) =>
+        args.Key == "Escape" ? CancelResetAsync() : Task.CompletedTask;
 
     private async Task ConfirmResetAsync()
     {
+        await Browser.CloseDialogAsync("reset-dialog");
         _showResetConfirmation = false;
         await AppState.ResetTodayAsync();
+        _focusCounterHeading = true;
     }
+
+    private string ProgressValueText => $"{AppStateService.ToMyanmarNumber(AppState.TodayCount)} မှ {AppStateService.ToMyanmarNumber(AppState.TodayTarget)} ထိချက်၊ {AppStateService.ToMyanmarNumber((int)Math.Round(AppState.TodayProgress * 100))} ရာခိုင်နှုန်း";
 
     public async ValueTask DisposeAsync() => await Browser.SetWakeLockAsync(false);
 }
