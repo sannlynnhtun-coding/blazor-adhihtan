@@ -1153,17 +1153,32 @@ p {
     align-items: center;
     justify-content: center;
     gap: .28rem;
+    padding: 0 .1rem .45rem;
     border-radius: 1rem;
     color: var(--muted);
-    font-size: .59rem;
+    font-size: .72rem;
     font-weight: 700;
+    line-height: 1.35;
+}
+
+.bottom-nav-item > span:last-child {
+    position: absolute;
+    z-index: 1;
+    right: .1rem;
+    bottom: .45rem;
+    left: .1rem;
+    display: block;
+    min-height: 1.35em;
+    overflow: visible;
+    line-height: 1.35;
+    text-align: center;
+    white-space: nowrap;
 }
 
 .bottom-nav-item.active { color: var(--primary); }
 .bottom-nav-item.active:not(.counter-tab) { background: color-mix(in srgb, var(--primary-container) 65%, transparent); }
 .counter-tab {
-    justify-content: flex-end;
-    padding: 0 0 .5rem;
+    padding-bottom: .45rem;
 }
 
 .counter-tab-icon {
@@ -1186,11 +1201,7 @@ p {
 .counter-tab-icon .app-icon { width: 1.55rem; height: 1.55rem; }
 
 .counter-tab-label {
-    position: relative;
-    display: block;
     z-index: 1;
-    line-height: 1.4;
-    white-space: nowrap;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -1285,7 +1296,6 @@ body:has(.app-shell) > .boot-loading { display: none; }
     .page { padding-right: .75rem; padding-left: .75rem; }
     .summary-grid { gap: .4rem; }
     .metric-card { padding-right: .35rem; padding-left: .35rem; }
-    .bottom-nav-item { font-size: .53rem; }
     .backup-actions { grid-template-columns: 1fr; }
     .schedule-row { grid-template-columns: 2.35rem 1fr; }
     .schedule-row > strong { grid-column: 2; }
