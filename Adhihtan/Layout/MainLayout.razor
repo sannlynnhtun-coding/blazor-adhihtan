@@ -24,6 +24,16 @@
     }
     else
     {
+        <header class="desktop-topbar">
+            <div>
+                <span>မင်္ဂလာပါ</span>
+                <strong>အဓိဋ္ဌာန်</strong>
+            </div>
+            <div class="desktop-topbar-actions">
+                <span class="desktop-date"><AppIcon Name="calendar" /> @BurmeseDateFormatter.Long(DateTime.Today)</span>
+                <NavLink class="desktop-counter-link" href="counter" aria-label="ပုတီးစိပ်ရန်"><AppIcon Name="counter" /></NavLink>
+            </div>
+        </header>
         <main id="main-content" class="app-content" tabindex="-1">
             @Body
         </main>
