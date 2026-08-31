@@ -11,7 +11,8 @@
             <p class="muted">@BurmeseDateFormatter.Long(DateTime.Today)</p>
         </div>
         <div class="header-emblem" aria-hidden="true">
-            <img src="assets/images/logo-blue.png" alt="" />
+            <span></span>
+            <AppIcon Name="counter" />
         </div>
     </header>
 
@@ -47,7 +48,13 @@
 
             <div class="hero-count-row">
                 <strong>@AppStateService.ToMyanmarNumber(AppState.TodayCount)</strong>
-                <span>/ @AppStateService.ToMyanmarNumber(AppState.TodayTarget) ပတ်</span>
+                <span>/ @AppStateService.ToMyanmarNumber(AppState.TodayTarget) ထိချက်</span>
+            </div>
+            <div class="bead-rhythm" aria-hidden="true">
+                @foreach (var bead in Enumerable.Range(0, 9))
+                {
+                    <i class="@(AppState.TodayProgress * 9 > bead ? "filled" : null)"></i>
+                }
             </div>
             <div class="progress-track" role="progressbar" aria-label="ယနေ့ ပုတီးစိပ်ပြီးစီးမှု" aria-valuenow="@AppState.TodayCount" aria-valuemin="0" aria-valuemax="@AppState.TodayTarget" aria-valuetext="@ProgressValueText">
                 <span style="width: @(AppState.TodayProgress * 100)%"></span>
