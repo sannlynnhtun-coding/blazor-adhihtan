@@ -1,50 +1,52 @@
-# အဓိဋ္ဌာန် — .NET 10 Blazor WebAssembly PWA
+# Adhihtan — .NET 10 Blazor WebAssembly PWA
 
-နေ့စဉ် အဓိဋ္ဌာန်နှင့် ပုတီးစိပ်မှတ်တမ်းများကို အင်တာနက်မလိုဘဲ အသုံးပြုနိုင်ရန် **standalone .NET 10 Blazor WebAssembly** PWA အဖြစ် တည်ဆောက်ထားသည်။ ASP.NET Core server project မလိုဘဲ Vercel static hosting ပေါ်တွင် တိုက်ရိုက်တင်နိုင်သည်။
+Adhihtan is a **standalone .NET 10 Blazor WebAssembly** progressive web app for managing daily vows and prayer-bead counting sessions. It works without a constant internet connection, requires no ASP.NET Core server project, and can be deployed directly to a static hosting provider such as Vercel.
 
-## ပါဝင်သော flow များ
+## Features
 
-- Login သို့မဟုတ် server account မလိုသော local-only အသုံးပြုမှု
-- ကိုးနဝင်း၊ ခန္တီစေတီ၊ ဂုဏ်တော်တစ်ထောင်၊ ဝါတွင်းသုံးလနှင့် စိတ်ကြိုက်တစ်ရက်ပုတီး
-- အဓိဋ္ဌာန် schedule ၁၉၇ ခုနှင့် အသေးစိတ်လမ်းညွှန်များ
-- ပုတီးကောင်တာပုံစံ ၁၃ မျိုး၊ အသံ၊ တုန်ခါမှု၊ reset confirmation နှင့် wake lock
-- Light/dark/high-contrast theme၊ ရာသီနောက်ခံများနှင့် Rabbit rules အတိုင်း Unicode/Zawgyi ပြောင်းလဲမှု
-- IndexedDB ထဲတွင် အစီအစဉ်၊ ရေတွက်မှုနှင့် မှတ်တမ်းများ အလိုအလျောက်သိမ်းဆည်းခြင်း
-- JSON backup ထုတ်ခြင်းနှင့် ပြန်သွင်းခြင်း
-- ပထမတစ်ကြိမ် online ဖွင့်ပြီးနောက် app၊ WebAssembly runtime၊ ပုံ၊ အသံနှင့် data အားလုံးကို offline အသုံးပြုနိုင်ခြင်း
+- Local-only use with no login or server account required
+- Built-in programs for Koe Naw Win, Khanti Ceti, One Thousand Virtues, the three-month Buddhist Lent, and custom one-day prayer-bead sessions
+- 197 vow schedules with detailed guidance
+- 13 prayer-bead counter styles, with sound, vibration, reset confirmation, and screen wake lock support
+- Light, dark, and high-contrast themes, seasonal backgrounds, and Unicode/Zawgyi conversion based on Rabbit rules
+- Automatic IndexedDB storage for programs, counts, and session history
+- JSON backup export and import
+- Full offline access to the app, WebAssembly runtime, images, audio, and data after the first online visit
 
-## Local run
+## Run locally
 
 ```powershell
 dotnet run --project .\Adhihtan\Adhihtan.csproj
 ```
 
-Console မှပြသော development URL ကို browser ဖြင့်ဖွင့်ပါ။ Development mode တွင် service worker က cache မလုပ်ပါ။ Offline/PWA အပြည့်အစုံကို Release publish ဖြင့်စမ်းပါ။
+Open the development URL shown in the console. The service worker does not cache files in development mode. To test the complete offline and PWA experience, use a Release build.
 
-## Static publish
+## Publish for static hosting
 
 ```powershell
 dotnet publish .\Adhihtan\Adhihtan.csproj -c Release -o .\artifacts\publish
 ```
 
-Static host အဖြစ် `artifacts/publish/wwwroot` folder ထဲကဖိုင်များကို deploy လုပ်ပါ။ Client-side routes အားလုံးကို `/index.html` သို့ fallback/rewrite လုပ်ထားရမည်။ PWA install နှင့် service worker အတွက် production တွင် HTTPS ဖြင့် host လုပ်ပါ။
+Deploy the files from `artifacts/publish/wwwroot` to your static host. Configure the host to rewrite or fall back all client-side routes to `/index.html`. Production deployments must use HTTPS to support PWA installation and service workers.
 
-## Vercel deploy
+## Deploy to Vercel
 
-Repository root ရှိ `vercel.json` က အောက်ပါတို့ကို အလိုအလျောက်လုပ်ပေးသည်။
+The `vercel.json` file in the repository root automatically:
 
-- Vercel Linux build image တွင် .NET 10 SDK ကို local `.dotnet` folder သို့ install လုပ်ခြင်း
-- `Adhihtan` ကို Release publish လုပ်ခြင်း
-- `artifacts/vercel/wwwroot` ကို static output အဖြစ် deploy လုပ်ခြင်း
-- Blazor client-side routes အားလုံးကို `/index.html` သို့ rewrite လုပ်ခြင်း
-- service worker ကို revalidate လုပ်ပြီး fingerprinted framework files ကို long-term cache လုပ်ခြင်း
+- Installs the .NET 10 SDK into the local `.dotnet` directory on the Vercel Linux build image
+- Publishes the `Adhihtan` project in Release mode
+- Deploys `artifacts/vercel/wwwroot` as the static output directory
+- Rewrites all Blazor client-side routes to `/index.html`
+- Revalidates the service worker while applying long-term caching to fingerprinted framework files
 
-Vercel dashboard မှ repository ကို import လုပ်ပြီး deploy လုပ်နိုင်သည်။ Project settings ထဲတွင် framework preset သို့မဟုတ် build/output commands ကို ထပ်ဖြည့်ရန်မလိုပါ။ Vercel CLI ရှိပါက repository root မှ—
+Import the repository from the Vercel dashboard and deploy it. You do not need to configure an additional framework preset, build command, or output directory in the project settings.
+
+If the Vercel CLI is installed, you can also deploy from the repository root:
 
 ```powershell
 vercel --prod
 ```
 
-## Content data ပြန်လည်တည်ဆောက်ခြင်း
+## Rebuild the content data
 
-`tools/recover-hermes-data.mjs` သည် source modules မှ category/schedule data ကို reproducibly ပြန်လည်တည်ဆောက်ပေးသည်။ လက်ရှိအသုံးပြုသော output သည် `Adhihtan/wwwroot/data/recovered-content.json` ဖြစ်သည်။
+The `tools/recover-hermes-data.mjs` script reproducibly rebuilds category and schedule data from the source modules. Its current output is stored in `Adhihtan/wwwroot/data/recovered-content.json`.
