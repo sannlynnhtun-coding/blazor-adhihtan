@@ -1860,3 +1860,117 @@ body:has(.app-shell) > .boot-loading { display: none; }
         left: 18rem;
     }
 }
+
+/* Typography scale matched to the supplied reference. */
+.app-shell {
+    --text-xs: .75rem;
+    --text-sm: .875rem;
+    --text-base: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.25rem;
+    --text-2xl: 1.5rem;
+}
+
+.eyebrow,
+.chip,
+.detail-duration,
+.offline-badge,
+.field-label,
+.field-help,
+.metric-card span,
+.today-card-header,
+.hero-footer-row,
+.counter-progress-row,
+.completion-banner small,
+.secondary-action span,
+.category-card-content small,
+.detail-hero p,
+.info-card p,
+.schedule-row small,
+.schedule-row em,
+.schedule-row > strong,
+.settings-group > h2,
+.setting-select-row small,
+.setting-toggle-row small,
+.setting-select-row select,
+.status-message {
+    font-size: var(--text-xs);
+}
+
+.bottom-nav-item {
+    font-size: var(--text-xs);
+}
+
+.muted,
+.empty-state p,
+.primary-button,
+.secondary-button,
+.danger-button,
+.text-button,
+.select-field,
+.text-field,
+.search-box input,
+.category-card-content em,
+.multiline-text,
+.setting-select-row b,
+.setting-toggle-row b {
+    font-size: var(--text-sm);
+}
+
+.empty-state h1,
+.empty-state h2 {
+    font-size: var(--text-2xl);
+    line-height: 1.45;
+}
+
+.hero-card h2,
+.modal-card h2 {
+    font-size: var(--text-xl);
+}
+
+.section-heading h2,
+.prose-card h2 {
+    font-size: var(--text-lg);
+}
+
+.category-card-content strong,
+.info-card h3,
+.schedule-row h3 {
+    font-size: var(--text-base);
+}
+
+@media (min-width: 900px) {
+    .page-header h1,
+    .counter-header h1 {
+        font-size: 2rem;
+    }
+
+    .desktop-topbar > div:first-child span {
+        font-size: var(--text-xs);
+    }
+
+    .desktop-topbar > div:first-child strong {
+        font-size: var(--text-xl);
+    }
+
+    .desktop-date {
+        font-size: var(--text-xs);
+    }
+
+    .nav-brand strong {
+        font-size: var(--text-xl);
+    }
+
+    .nav-brand small {
+        font-size: var(--text-xs);
+    }
+
+    .bottom-nav-item {
+        font-size: var(--text-sm);
+    }
+
+    .nav-note strong,
+    .nav-note p {
+        font-size: var(--text-xs);
+    }
+}
