@@ -12,25 +12,25 @@
   "lang": "my",
   "icons": [
     {
-      "src": "icons/icon-192.png",
+      "src": "icons/icon-orange-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icons/icon-round-192.png",
+      "src": "icons/icon-orange-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "icons/icon-512.png",
+      "src": "icons/icon-orange-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icons/icon-round-512.png",
+      "src": "icons/icon-orange-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
